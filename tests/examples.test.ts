@@ -2,7 +2,7 @@
  * Tests that verify the code examples from docs/ actually work.
  * Each describe block corresponds to a docs file.
  */
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   combines,
   declares,
@@ -64,11 +64,7 @@ describe("example: error catalog", () => {
   const getUser = declares(
     [UserNotFoundError, UnauthorizedError],
     async (id: string, token: string) => {
-      const session = ensure(
-        verifyToken(token),
-        UnauthorizedError,
-        "Invalid token",
-      );
+      ensure(verifyToken(token), UnauthorizedError, "Invalid token");
       const user = id === "1" ? { id, name: "Alice" } : null;
       return ensure(user, UserNotFoundError, `No user: ${id}`);
     },

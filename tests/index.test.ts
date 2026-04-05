@@ -3,6 +3,7 @@ import {
   combines,
   declares,
   defineError,
+  EnsureError,
   ensure,
   fault,
   fromJSON,
@@ -258,6 +259,37 @@ describe("ensure", () => {
       });
     } catch (e) {
       expect(then.cause(e as Error)).toBe(scenarios.causes.root);
+    }
+  });
+
+  it("string form — throws EnsureError with the message", () => {
+    try {
+      ensure(null, "Could not find user");
+    } catch (e) {
+      expect(e).toBeInstanceOf(EnsureError);
+      expect((e as Error).message).toBe("Could not find user");
+    }
+  });
+
+  it("class-only form — message defaults to error name", () => {
+    const { scenarios } = given();
+    try {
+      ensure(null, scenarios.errors.notFound);
+    } catch (e) {
+      expect(e).toBeInstanceOf(scenarios.errors.notFound);
+      expect((e as Error).message).toBe("NotFoundError");
+    }
+  });
+
+  it("string form — matchable as EnsureError for remapping", () => {
+    try {
+      ensure(null, "Could not find user");
+    } catch (e) {
+      const result = match(e, {
+        EnsureError: (err) => `remapped: ${err.message}`,
+        _: () => "fallback",
+      });
+      expect(result).toBe("remapped: Could not find user");
     }
   });
 });

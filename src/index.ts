@@ -6,7 +6,7 @@
 
 export { combines, declares } from "./declares";
 export { defineError } from "./define-error";
-export { ensure } from "./ensure";
+export { EnsureError, ensure } from "./ensure";
 export { fault } from "./fault";
 export { match } from "./match";
 export {
