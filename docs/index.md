@@ -17,40 +17,40 @@ JavaScript error handling is broken by default. Functions throw, but callers hav
 pnpm add @chan.run/fault
 ```
 
-## Quick Example
+## Quick Start
 
 ```ts
-import { defineError, ensure, declares, tryAsync, match } from "@chan.run/fault";
+import { defineError, ensure, tryAsync, match } from "@chan.run/fault";
 
 const NotFoundError = defineError("NotFoundError");
-const DbError = defineError("DbError");
 
-const getUser = declares([NotFoundError, DbError], async (id: string) => {
-  const row = await db.users.findById(id);
-  return ensure(row, NotFoundError, `No user: ${id}`);
-});
+// Guard a nullable value — throws NotFoundError if null/undefined
+const user = ensure(db.find(id), NotFoundError, `No user: ${id}`);
 
-const result = await tryAsync(getUser, id);
+// Safe async execution — never rejects
+const result = await tryAsync(() => fetchUser(id));
 
 if (!result.ok) {
-  match(result.error, [NotFoundError, DbError], {
+  match(result.error, {
     NotFoundError: (err) => respond(404, err.message),
-    DbError: (err) => respond(503, "DB unavailable"),
+    _: (err) => { throw err },
   });
 }
 ```
 
-## API Overview
+## API
 
 | Export        | Purpose                                      |
 |---------------|----------------------------------------------|
 | `ensure`      | Assert non-null/undefined, throw if missing  |
 | `defineError` | Define a reusable typed error class          |
-| `fault()`     | Throw a typed error — inline or from a class |
+| `fault()`     | Throw a typed error with cause chaining      |
 | `trySync()`   | Run sync code, return `{ ok, data/error }`   |
 | `tryAsync()`  | Run async code, return `{ ok, data/error }`  |
 | `declares()`  | Annotate a function's error surface          |
 | `match()`     | Handle errors by type with a handler map     |
+
+See the full [API reference](/docs/products/fault/api) and [examples](/docs/products/fault/examples/route-handler).
 
 ## Environment Support
 
