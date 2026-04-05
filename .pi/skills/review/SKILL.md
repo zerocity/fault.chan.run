@@ -27,12 +27,13 @@ Read structural entry points:
 
 - `src/index.ts` — public API surface
 - `src/types.ts` — core type definitions
+- `src/ensure.ts` — null/undefined guard
 - `src/define-error.ts` — error class factory
 - `src/fault.ts` — throw helper with inline cache
-- `src/expect.ts` — null assertion
 - `src/try.ts` — safe execution wrappers
-- `src/declares.ts` — type-level function annotation
+- `src/declares.ts` — type-level function annotation + combines
 - `src/match.ts` — error handler dispatch
+- `src/serialize.ts` — toJSON / fromJSON for API boundaries
 
 Check for hidden dependencies, type leaks, export consistency, and missing edge cases.
 

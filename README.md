@@ -68,7 +68,7 @@ export async function handleGetUser(req: Request): Promise<Response> {
 
 These work standalone — no type annotations needed.
 
-### `ensure(value, ErrorClass, message)`
+### `ensure(value, ErrorClass, message, options?)`
 
 Assert that a value is not `null` or `undefined`. Returns the narrowed value, or throws.
 
@@ -217,6 +217,36 @@ match(result.error, [NotFoundError, DbError], {
 ```
 
 Each handler receives the error narrowed to its specific type — `err.name` is a string literal, not `string`.
+
+### `combines(sources, fn)` — compose error surfaces
+
+When a function calls multiple declared functions, combine their error surfaces:
+
+```ts
+const getUser = declares([NotFoundError, DbError], ...);
+const getOrder = declares([OrderError, DbError], ...);
+
+const getUserOrder = combines([getUser, getOrder], async (userId, orderId) => {
+  const user = await getUser(userId);
+  const order = await getOrder(orderId);
+  return { user, order };
+});
+// getUserOrder can throw NotFoundError | DbError | OrderError
+```
+
+### `toJSON(error)` / `fromJSON(data, registry)` — serialization
+
+Serialize fault errors for API responses, reconstruct on the client:
+
+```ts
+// Server
+res.json(toJSON(err));
+// { name: "NotFoundError", code: "NotFoundError", message: "No user: 123" }
+
+// Client
+const err = fromJSON(body.error, { NotFoundError, DbError });
+// err instanceof NotFoundError === true
+```
 
 ## Patterns
 

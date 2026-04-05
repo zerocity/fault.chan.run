@@ -27,24 +27,28 @@ This is `fault`'s primary use case — catch an untyped error and rethrow it as 
 ## HTTP client wrapper
 
 ```ts
-import { defineError, declares, fault } from "@chan.run/fault";
+import { defineError, declares, fault, tryAsync, match } from "@chan.run/fault";
 
 const ApiError = defineError("ApiError");
 const TimeoutError = defineError("TimeoutError");
 
 export const fetchJson = declares([ApiError, TimeoutError], async (url: string) => {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      fault(ApiError, `HTTP ${res.status}: ${res.statusText}`);
-    }
-    return await res.json();
-  } catch (e) {
-    if (e instanceof DOMException && e.name === "AbortError") {
-      fault(TimeoutError, `Request to ${url} timed out`, { cause: e });
-    }
-    fault(ApiError, `Request to ${url} failed`, { cause: e });
+  const result = await tryAsync(() => fetch(url));
+
+  if (!result.ok) {
+    // Match the caught error by name — no instanceof chains
+    match(result.error, {
+      AbortError: (e) => fault(TimeoutError, `Request to ${url} timed out`, { cause: e }),
+      _: (e) => fault(ApiError, `Request to ${url} failed`, { cause: e }),
+    });
   }
+
+  const res = result.data;
+  if (!res.ok) {
+    fault(ApiError, `HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return await res.json();
 });
 ```
 

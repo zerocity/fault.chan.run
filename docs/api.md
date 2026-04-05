@@ -215,7 +215,7 @@ All types are exported for advanced use:
 |------|-------------|
 | `FaultError` | Marker interface — `name`, `code`, `isFault: true` |
 | `NamedFaultError<N>` | Fault error with literal name type |
-| `FaultErrorClass` | Constructor for `FaultError` |
+| `FaultErrorClass` | Shorthand for `NamedFaultErrorClass<string>` |
 | `NamedFaultErrorClass<N>` | Constructor with literal name |
 | `SyncResult<T, E>` | `{ ok: true, data: T } \| { ok: false, error: E }` |
 | `AsyncResult<T, E>` | Same as `SyncResult`, for async |

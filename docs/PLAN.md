@@ -8,10 +8,10 @@ Check off tasks as they're completed.
 ## Phase 1: Foundation
 
 - [x] Project setup (scaffold, CI, mise.toml)
-- [x] Core API implementation (defineError, fault, expect, trySync, tryAsync, declares, match)
+- [x] Core API implementation (defineError, fault, ensure, trySync, tryAsync, declares, match)
 - [x] Initial test suite → 36 tests (edge cases, error chaining, inline codes, cause propagation)
 - [x] Code review — all findings addressed, zero `any`
-- [x] `ensure` alias for `expect` (avoids test framework name collision)
+- [x] Renamed `expect` to `ensure` (avoids test framework name collision)
 - [x] Release-please CI with npm publish + docs deploy trigger
 - [x] Standalone workspace (independent from parent pnpm workspace)
 - [x] Biome 2, TypeScript 6, Vitest 4

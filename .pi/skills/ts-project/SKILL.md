@@ -12,12 +12,13 @@ fault/
 ├── src/              ← library source (one file per API function)
 │   ├── index.ts      ← public re-exports only
 │   ├── types.ts      ← shared type definitions
+│   ├── ensure.ts
 │   ├── define-error.ts
 │   ├── fault.ts
-│   ├── expect.ts
 │   ├── try.ts
 │   ├── declares.ts
-│   └── match.ts
+│   ├── match.ts
+│   └── serialize.ts
 ├── tests/            ← vitest test files
 ├── docs/             ← product documentation
 ├── dist/             ← build output (ESM + CJS + .d.ts)

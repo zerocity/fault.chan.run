@@ -10,15 +10,18 @@ This is a **TypeScript library** distributed on npm as `@chan.run/fault`. It pro
 
 ## API Surface
 
-| Export        | File              | Purpose                                      |
-|---------------|-------------------|----------------------------------------------|
-| `defineError` | `src/define-error.ts` | Define a reusable typed error class      |
-| `fault()`     | `src/fault.ts`    | Throw a typed error — inline or from a class |
-| `ensure()`    | `src/ensure.ts`   | Assert non-null/undefined, throw if missing  |
-| `trySync()`   | `src/try.ts`      | Run sync code, return `{ ok, data/error }`   |
-| `tryAsync()`  | `src/try.ts`      | Run async code, return `{ ok, data/error }`  |
-| `declares()`  | `src/declares.ts` | Annotate a function's error surface          |
-| `match()`     | `src/match.ts`    | Handle errors by type with a handler map     |
+| Export        | File              | Purpose                                        |
+|---------------|-------------------|------------------------------------------------|
+| `ensure()`    | `src/ensure.ts`   | Assert non-null/undefined, throw if missing    |
+| `defineError` | `src/define-error.ts` | Define a reusable typed error class        |
+| `fault()`     | `src/fault.ts`    | Throw a typed error with cause chaining        |
+| `trySync()`   | `src/try.ts`      | Run sync code, return `{ ok, data/error }`     |
+| `tryAsync()`  | `src/try.ts`      | Run async code, return `{ ok, data/error }`    |
+| `declares()`  | `src/declares.ts` | Annotate a function's error surface            |
+| `combines()`  | `src/declares.ts` | Compose error surfaces from declared functions |
+| `match()`     | `src/match.ts`    | Handle errors by type with a handler map       |
+| `toJSON()`    | `src/serialize.ts`| Serialize a fault error for JSON transport     |
+| `fromJSON()`  | `src/serialize.ts`| Reconstruct a fault error from JSON            |
 
 ## Structure
 
@@ -27,17 +30,18 @@ fault/
 ├── src/              ← library source
 │   ├── index.ts      ← public barrel (re-exports only)
 │   ├── types.ts      ← FaultError, FaultErrorClass, result types
+│   ├── ensure.ts
 │   ├── define-error.ts
 │   ├── fault.ts
-│   ├── expect.ts
 │   ├── try.ts
 │   ├── declares.ts
-│   └── match.ts
+│   ├── match.ts
+│   └── serialize.ts
 ├── tests/            ← vitest tests
 ├── docs/             ← documentation
 ├── dist/             ← build output (ESM + CJS + .d.ts)
 ├── .pi/skills/       ← agent skills
-└── .github/workflows/ci.yml
+└── .github/workflows/
 ```
 
 ## Technology Stack
@@ -92,7 +96,12 @@ Runs: format:check → lint → typecheck → test → build
 - `src/index.ts`
 - `src/types.ts`
 - `src/define-error.ts`
+- `src/ensure.ts`
 - `src/fault.ts`
+- `src/declares.ts`
+- `src/match.ts`
+- `src/serialize.ts`
+- `src/try.ts`
 
 ### design
 
