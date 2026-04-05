@@ -61,6 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger www.chan.run deploy
-        run: gh workflow run deploy.yml -R zerocity/www.chan.run
+        run: gh workflow run deploy.yml -R zerocity/www.chan.run --ref main
         env:
           GH_TOKEN: ${{ secrets.PRODUCT_DOCS_TOKEN }}
