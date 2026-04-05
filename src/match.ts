@@ -1,13 +1,9 @@
-import type { FaultError } from "./types";
-
-type MatchHandlers<T> = {
-	[nameOrCode: string]: (error: FaultError) => T;
-} & {
-	_?: (error: unknown) => T;
-};
+import type { FaultError, MatchHandlers } from "./types";
 
 /**
  * Handle an error by matching against a handler map keyed by name or code.
+ * Only fault-created errors (with isFault === true) are matched by name/code.
+ * Non-fault errors fall through to the _ handler or are re-thrown.
  *
  * ```ts
  * match(error, {
@@ -18,27 +14,29 @@ type MatchHandlers<T> = {
  * ```
  */
 export function match<T>(error: unknown, handlers: MatchHandlers<T>): T {
-	if (error instanceof Error) {
-		const faultError = error as FaultError;
+  if (error instanceof Error && isFaultError(error)) {
+    // Match by name first, then by code
+    const nameHandler = handlers[error.name];
+    if (nameHandler) {
+      return nameHandler(error);
+    }
 
-		// Match by name first
-		const nameHandler = faultError.name ? handlers[faultError.name] : undefined;
-		if (nameHandler) {
-			return nameHandler(faultError);
-		}
+    const codeHandler = handlers[error.code];
+    if (codeHandler) {
+      return codeHandler(error);
+    }
+  }
 
-		// Then by code
-		const codeHandler = faultError.code ? handlers[faultError.code] : undefined;
-		if (codeHandler) {
-			return codeHandler(faultError);
-		}
-	}
+  // Fallback handler
+  if (handlers._) {
+    return handlers._(error);
+  }
 
-	// Fallback handler
-	if (handlers._) {
-		return handlers._(error);
-	}
+  // No match and no fallback — re-throw
+  throw error;
+}
 
-	// No match and no fallback — re-throw
-	throw error;
+/** Type guard: checks isFault marker without casting to any. */
+function isFaultError(error: Error): error is FaultError {
+  return "isFault" in error && (error as FaultError).isFault === true;
 }

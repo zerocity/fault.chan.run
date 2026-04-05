@@ -1,6 +1,9 @@
 import { defineError } from "./define-error";
 import type { FaultErrorClass } from "./types";
 
+// Cache for inline string codes. Keyed by the code string, so each unique
+// code creates exactly one error class. Use only with static string codes —
+// dynamic codes (e.g. template literals with IDs) will leak memory.
 const inlineCache = new Map<string, FaultErrorClass>();
 
 /**
@@ -12,22 +15,22 @@ const inlineCache = new Map<string, FaultErrorClass>();
  * ```
  */
 export function fault(
-	target: FaultErrorClass | string,
-	message: string,
-	options?: { cause?: unknown },
+  target: FaultErrorClass | string,
+  message: string,
+  options?: { cause?: unknown },
 ): never {
-	let ErrorClass: FaultErrorClass;
+  let ErrorClass: FaultErrorClass;
 
-	if (typeof target === "string") {
-		let cached = inlineCache.get(target);
-		if (!cached) {
-			cached = defineError(target);
-			inlineCache.set(target, cached);
-		}
-		ErrorClass = cached;
-	} else {
-		ErrorClass = target;
-	}
+  if (typeof target === "string") {
+    let cached = inlineCache.get(target);
+    if (!cached) {
+      cached = defineError(target);
+      inlineCache.set(target, cached);
+    }
+    ErrorClass = cached;
+  } else {
+    ErrorClass = target;
+  }
 
-	throw new ErrorClass(message, options);
+  throw new ErrorClass(message, options);
 }

@@ -4,16 +4,18 @@
  * @module
  */
 
-export { defineError } from "./define-error";
-export { fault } from "./fault";
-export { expect } from "./expect";
-export { trySync, tryAsync } from "./try";
 export { declares } from "./declares";
+export { defineError } from "./define-error";
+export { expect, expect as ensure } from "./expect";
+export { fault } from "./fault";
 export { match } from "./match";
+export { tryAsync, trySync } from "./try";
 export type {
-	FaultError,
-	FaultErrorClass,
-	SyncResult,
-	AsyncResult,
-	DeclaredFn,
+  AsyncResult,
+  DeclaredFn,
+  FaultError,
+  FaultErrorClass,
+  InferFaultErrors,
+  MatchHandlers,
+  SyncResult,
 } from "./types";

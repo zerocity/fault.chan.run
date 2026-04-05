@@ -8,13 +8,13 @@ import type { FaultErrorClass } from "./types";
  * ```
  */
 export function expect<T>(
-	value: T,
-	ErrorClass: FaultErrorClass,
-	message: string,
-	options?: { cause?: unknown },
+  value: T,
+  ErrorClass: FaultErrorClass,
+  message: string,
+  options?: { cause?: unknown },
 ): NonNullable<T> {
-	if (value === null || value === undefined) {
-		throw new ErrorClass(message, options);
-	}
-	return value as NonNullable<T>;
+  if (value === null || value === undefined) {
+    throw new ErrorClass(message, options);
+  }
+  return value as NonNullable<T>;
 }

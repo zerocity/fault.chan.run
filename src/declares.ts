@@ -11,12 +11,12 @@ import type { DeclaredFn, FaultErrorClass } from "./types";
  * ```
  */
 export function declares<
-	TArgs extends unknown[],
-	TReturn,
-	TErrors extends FaultErrorClass[],
+  TArgs extends unknown[],
+  TReturn,
+  TErrors extends FaultErrorClass[],
 >(
-	_errorClasses: [...TErrors],
-	fn: (...args: TArgs) => TReturn,
+  _errorClasses: [...TErrors],
+  fn: (...args: TArgs) => TReturn,
 ): DeclaredFn<TArgs, TReturn, TErrors> {
-	return fn as DeclaredFn<TArgs, TReturn, TErrors>;
+  return fn as DeclaredFn<TArgs, TReturn, TErrors>;
 }
