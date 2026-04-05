@@ -1,5 +1,5 @@
 /**
- * @chan.run/fault — Type-safe errors without the boilerplate.
+ * @chan.run/ensure — Type-safe errors without the boilerplate.
  *
  * @module
  */

@@ -1,6 +1,6 @@
 ---
 name: ts-project
-description: "TypeScript library conventions for @chan.run/fault. Use when writing or reviewing TypeScript code."
+description: "TypeScript library conventions for @chan.run/ensure. Use when writing or reviewing TypeScript code."
 ---
 
 # TypeScript Project Conventions
@@ -8,7 +8,7 @@ description: "TypeScript library conventions for @chan.run/fault. Use when writi
 ## Project Structure
 
 ```
-fault/
+ensure/
 ├── src/              ← library source (one file per API function)
 │   ├── index.ts      ← public re-exports only
 │   ├── types.ts      ← shared type definitions

@@ -9,7 +9,7 @@ Define all errors for a domain in one file. Import them everywhere.
 
 ```ts
 // errors.ts
-import { defineError } from "@chan.run/fault";
+import { defineError } from "@chan.run/ensure";
 
 // Auth
 export const UnauthorizedError = defineError("UnauthorizedError");
@@ -29,7 +29,7 @@ Then use them across your codebase:
 
 ```ts
 // user-service.ts
-import { declares, ensure } from "@chan.run/fault";
+import { declares, ensure } from "@chan.run/ensure";
 import { UserNotFoundError, UnauthorizedError } from "./errors";
 
 export const getUser = declares(

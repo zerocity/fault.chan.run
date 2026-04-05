@@ -1,26 +1,26 @@
 ---
-title: "@chan.run/fault"
+title: "@chan.run/ensure"
 description: "Type-safe errors without the boilerplate"
 ---
 
-# @chan.run/fault
+# @chan.run/ensure
 
 Type-safe errors without the boilerplate. Make error contracts explicit with zero ceremony.
 
 ## Why?
 
-JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/fault` makes errors part of the contract — with zero friction.
+JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/ensure` makes errors part of the contract — with zero friction.
 
 ## Install
 
 ```bash
-pnpm add @chan.run/fault
+pnpm add @chan.run/ensure
 ```
 
 ## Quick Start
 
 ```ts
-import { defineError, ensure, tryAsync, match } from "@chan.run/fault";
+import { defineError, ensure, tryAsync, match } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 

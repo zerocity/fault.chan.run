@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: Complete API reference for @chan.run/fault
+description: Complete API reference for @chan.run/ensure
 ---
 
 # API Reference
@@ -16,7 +16,7 @@ Assert that a value is not `null` or `undefined`. Returns the narrowed value, or
 Three forms:
 
 ```ts
-import { ensure, defineError } from "@chan.run/fault";
+import { ensure, defineError } from "@chan.run/ensure";
 
 const NotFound = defineError("NotFound");
 
@@ -52,7 +52,7 @@ const config = ensure(parseResult, ConfigError, "parse failed", { cause: origina
 Create a reusable typed error class. Every instance has `name`, `code`, `isFault: true`, and full `Error` compatibility. The name string literal is preserved in the type system.
 
 ```ts
-import { defineError } from "@chan.run/fault";
+import { defineError } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 const ValidationError = defineError("ValidationError", { code: "VALIDATION" });
@@ -75,7 +75,7 @@ err.isFault; // true
 Throw a typed error with cause chaining. Use `fault` when you're catching an error and rethrowing it as a typed fault. For null-guards, use `ensure` instead.
 
 ```ts
-import { fault, defineError } from "@chan.run/fault";
+import { fault, defineError } from "@chan.run/ensure";
 
 const ApiError = defineError("ApiError");
 
@@ -104,7 +104,7 @@ fault("RATE_LIMITED", "Too many requests");
 Run code safely. Always returns — never throws or rejects. The result is a discriminated union that forces you to handle both cases.
 
 ```ts
-import { trySync, tryAsync } from "@chan.run/fault";
+import { trySync, tryAsync } from "@chan.run/ensure";
 
 // Sync
 const result = trySync(() => JSON.parse(raw));
@@ -128,7 +128,7 @@ Match an error by name or code. The `_` key is the fallback.
 - **Plain `Error`** (name is `"Error"`) — always falls through to `_`
 
 ```ts
-import { match } from "@chan.run/fault";
+import { match } from "@chan.run/ensure";
 
 match(error, {
   NotFoundError: (err) => respond(404, err.message),
@@ -146,7 +146,7 @@ Adds compile-time safety to the basic API.
 Annotate a function's error surface. Zero runtime cost — purely type-level.
 
 ```ts
-import { declares, defineError, ensure } from "@chan.run/fault";
+import { declares, defineError, ensure } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 const DbError = defineError("DbError");
@@ -196,7 +196,7 @@ Each handler receives the error narrowed to its specific type — `err.name` is 
 When a function calls multiple declared functions, combine their error surfaces into one:
 
 ```ts
-import { combines, declares } from "@chan.run/fault";
+import { combines, declares } from "@chan.run/ensure";
 
 const getUser = declares([NotFoundError, DbError], ...);
 const getOrder = declares([OrderError, DbError], ...);
@@ -214,7 +214,7 @@ const getUserOrder = combines([getUser, getOrder], async (userId, orderId) => {
 Serialize fault errors for JSON transport (API responses, logs). Reconstruct on the other side with a registry.
 
 ```ts
-import { toJSON, fromJSON } from "@chan.run/fault";
+import { toJSON, fromJSON } from "@chan.run/ensure";
 
 // Serialize
 const json = toJSON(err);

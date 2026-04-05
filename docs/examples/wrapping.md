@@ -8,7 +8,7 @@ description: Turn untyped third-party errors into typed faults
 Third-party libraries throw untyped errors. Wrap them with `fault` to bring them into your typed error system.
 
 ```ts
-import { defineError, declares, fault, trySync } from "@chan.run/fault";
+import { defineError, declares, fault, trySync } from "@chan.run/ensure";
 
 const ConfigError = defineError("ConfigError");
 
@@ -27,7 +27,7 @@ This is `fault`'s primary use case — catch an untyped error and rethrow it as 
 ## HTTP client wrapper
 
 ```ts
-import { defineError, declares, fault, tryAsync, match } from "@chan.run/fault";
+import { defineError, declares, fault, tryAsync, match } from "@chan.run/ensure";
 
 const ApiError = defineError("ApiError");
 const TimeoutError = defineError("TimeoutError");

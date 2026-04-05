@@ -1,5 +1,5 @@
 {
-  "name": "@chan.run/fault",
+  "name": "@chan.run/ensure",
   "version": "0.1.0",
   "description": "Type-safe errors without the boilerplate",
   "license": "MIT",
@@ -38,7 +38,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zerocity/fault.chan.run.git"
+    "url": "https://github.com/zerocity/ensure.chan.run.git"
   },
   "keywords": [
     "error",

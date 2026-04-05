@@ -2,7 +2,7 @@
 
 ## Overview
 
-Development plan for @chan.run/fault. Tasks are organized in phases.
+Development plan for @chan.run/ensure. Tasks are organized in phases.
 Check off tasks as they're completed.
 
 ## Phase 1: Foundation

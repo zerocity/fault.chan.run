@@ -1,12 +1,12 @@
-# @chan.run/fault
+# @chan.run/ensure
 
 Type-safe errors without the boilerplate.
 
 ## Overview
 
-JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/fault` makes errors explicit — with zero ceremony.
+JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/ensure` makes errors explicit — with zero ceremony.
 
-This is a **TypeScript library** distributed on npm as `@chan.run/fault`. It provides typed error classes, safe execution wrappers, and error matching — everything needed to make error contracts visible in the type system.
+This is a **TypeScript library** distributed on npm as `@chan.run/ensure`. It provides typed error classes, safe execution wrappers, and error matching — everything needed to make error contracts visible in the type system.
 
 ## API Surface
 
@@ -27,7 +27,7 @@ This is a **TypeScript library** distributed on npm as `@chan.run/fault`. It pro
 ## Structure
 
 ```
-fault/
+ensure/
 ├── src/              ← library source
 │   ├── index.ts      ← public barrel (re-exports only)
 │   ├── types.ts      ← FaultError, FaultErrorClass, result types
@@ -65,7 +65,7 @@ fault/
 
 ## Development Workflow
 
-Load `.pi/skills/fault-dev/SKILL.md` for the full development protocol.
+Load `.pi/skills/ensure-dev/SKILL.md` for the full development protocol.
 
 ## Verification Gate
 

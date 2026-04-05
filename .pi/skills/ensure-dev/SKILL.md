@@ -1,11 +1,11 @@
 ---
-name: fault-dev
-description: "Use when working on any @chan.run/fault implementation task. Covers dev workflow, architecture checks, and implementation guidelines."
+name: ensure-dev
+description: "Use when working on any @chan.run/ensure implementation task. Covers dev workflow, architecture checks, and implementation guidelines."
 ---
 
-# Fault Development Skill
+# Ensure Development Skill
 
-Use this skill when working on any @chan.run/fault implementation task.
+Use this skill when working on any @chan.run/ensure implementation task.
 
 ## Before Starting Work
 

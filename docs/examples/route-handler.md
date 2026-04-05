@@ -8,7 +8,7 @@ description: A complete route handler with typed error handling
 A complete route handler showing `defineError`, `ensure`, `declares`, `tryAsync`, and exhaustive `match` working together.
 
 ```ts
-import { defineError, ensure, declares, tryAsync, match } from "@chan.run/fault";
+import { defineError, ensure, declares, tryAsync, match } from "@chan.run/ensure";
 
 // Error catalog for the users domain
 const UserNotFoundError = defineError("UserNotFoundError");

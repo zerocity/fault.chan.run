@@ -1,19 +1,19 @@
-# @chan.run/fault
+# @chan.run/ensure
 
 Type-safe errors without the boilerplate.
 
 ```bash
-pnpm add @chan.run/fault
+pnpm add @chan.run/ensure
 ```
 
 ## Why?
 
-JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/fault` makes error contracts explicit — with zero ceremony.
+JavaScript error handling is broken by default. Functions throw, but callers have no idea what. `@chan.run/ensure` makes error contracts explicit — with zero ceremony.
 
 ## Quick Start
 
 ```ts
-import { defineError, ensure, tryAsync, match } from "@chan.run/fault";
+import { defineError, ensure, tryAsync, match } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 
@@ -36,7 +36,7 @@ if (!result.ok) {
 A complete route handler showing every part of the library working together:
 
 ```ts
-import { defineError, ensure, declares, tryAsync, match } from "@chan.run/fault";
+import { defineError, ensure, declares, tryAsync, match } from "@chan.run/ensure";
 
 // Define typed errors — each carries its name in the type system
 const UserNotFoundError = defineError("UserNotFoundError");
@@ -73,7 +73,7 @@ These work standalone — no type annotations needed.
 Assert that a value is not `null` or `undefined`. Returns the narrowed value, or throws.
 
 ```ts
-import { ensure, defineError } from "@chan.run/fault";
+import { ensure, defineError } from "@chan.run/ensure";
 
 const NotFound = defineError("NotFound");
 
@@ -103,7 +103,7 @@ Falsy values like `0`, `""`, and `false` pass through — only `null` and `undef
 Create a reusable typed error class. Every instance has `name`, `code`, `isFault: true`, and full `Error` compatibility.
 
 ```ts
-import { defineError } from "@chan.run/fault";
+import { defineError } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 const ValidationError = defineError("ValidationError", { code: "VALIDATION" });
@@ -121,7 +121,7 @@ Options: `{ code?: string, base?: typeof Error }`
 Throw a typed error with cause chaining. Use `fault` when you're catching an error and rethrowing it as a typed fault — this is its primary purpose. For null-guards, use `ensure` instead.
 
 ```ts
-import { fault, defineError } from "@chan.run/fault";
+import { fault, defineError } from "@chan.run/ensure";
 
 const ApiError = defineError("ApiError");
 
@@ -150,7 +150,7 @@ fault("RATE_LIMITED", "Too many requests");
 Run code safely. Always returns — never throws or rejects. The result is a discriminated union that forces you to handle both cases.
 
 ```ts
-import { trySync, tryAsync } from "@chan.run/fault";
+import { trySync, tryAsync } from "@chan.run/ensure";
 
 // Sync
 const result = trySync(() => JSON.parse(raw));
@@ -170,7 +170,7 @@ const userResult = await tryAsync(() => fetchUser(id));
 Match an error by name or code. The `_` key is the fallback. Works with fault errors (by name + code), native errors like `TypeError` and `AbortError` (by name), and plain `Error` (always falls through to `_`).
 
 ```ts
-import { match } from "@chan.run/fault";
+import { match } from "@chan.run/ensure";
 
 match(error, {
   NotFoundError: (err) => respond(404, err.message),
@@ -188,7 +188,7 @@ The advanced story. Adds compile-time safety to the basic API.
 Annotate a function's error surface. Zero runtime cost — purely type-level.
 
 ```ts
-import { declares, defineError, ensure } from "@chan.run/fault";
+import { declares, defineError, ensure } from "@chan.run/ensure";
 
 const NotFoundError = defineError("NotFoundError");
 const DbError = defineError("DbError");
