@@ -35,22 +35,21 @@ export function toJSON(error: FaultError): FaultErrorJSON {
  *
  * ```ts
  * const registry = { NotFoundError, DbError };
- * const err = detoJSON(json, registry);
+ * const err = fromJSON(json, registry);
  * // err instanceof NotFoundError === true
  * ```
  *
  * Returns a generic Error if the name isn't in the registry.
  */
-export function detoJSON(
+export function fromJSON(
   data: FaultErrorJSON,
   registry: Record<string, FaultErrorClass>,
-): FaultError | Error {
+): Error {
   const ErrorClass = registry[data.name];
   if (ErrorClass) {
-    const err = new ErrorClass(data.message);
-    return err;
+    return new ErrorClass(data.message);
   }
-  // Fallback — name not in registry
+  // Name not in registry — return plain Error
   const err = new Error(data.message);
   err.name = data.name;
   return err;

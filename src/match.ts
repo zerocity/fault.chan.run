@@ -14,7 +14,7 @@ import type {
  * exhaustiveness-checked — TypeScript will error if you miss one:
  *
  * ```ts
- * const result = await tryAsync(() => getUser(id));
+ * const result = await tryAsync(getUser, id);
  * if (!result.ok) {
  *   // TypeScript requires handlers for NotFoundError AND DbError
  *   match(result.error, [NotFoundError, DbError], {
@@ -76,5 +76,5 @@ export function match<T>(
 
 /** Type guard: checks isFault marker without casting to any. */
 function isFaultError(error: Error): error is FaultError {
-  return "isFault" in error && (error as FaultError).isFault === true;
+  return "isFault" in error && (error as { isFault: unknown }).isFault === true;
 }

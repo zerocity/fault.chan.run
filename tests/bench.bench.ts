@@ -1,5 +1,5 @@
 import { bench, describe } from "vitest";
-import { defineError, ensure, fault, match, trySync } from "../src/index";
+import { defineError, ensure, match, trySync } from "../src/index";
 
 const NotFoundError = defineError("NotFoundError");
 const DbError = defineError("DbError");

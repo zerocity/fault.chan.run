@@ -3,9 +3,9 @@ import {
   combines,
   declares,
   defineError,
-  detoJSON,
   ensure,
   fault,
+  fromJSON,
   type MatchHandlers,
   match,
   toJSON,
@@ -560,11 +560,11 @@ describe("toJSON", () => {
   });
 });
 
-describe("detoJSON", () => {
+describe("fromJSON", () => {
   it("reconstructs a fault error from serialized data", () => {
     const { scenarios } = given();
     const registry = { NotFoundError: scenarios.errors.notFound };
-    const err = detoJSON(
+    const err = fromJSON(
       { name: "NotFoundError", code: "NotFoundError", message: "gone" },
       registry,
     );
@@ -574,7 +574,7 @@ describe("detoJSON", () => {
   });
 
   it("returns plain Error when name not in registry", () => {
-    const err = detoJSON(
+    const err = fromJSON(
       { name: "UnknownError", code: "UNKNOWN", message: "hmm" },
       {},
     );
@@ -588,7 +588,7 @@ describe("detoJSON", () => {
     const { scenarios } = given();
     const original = new scenarios.errors.notFound("round trip");
     const json = toJSON(original);
-    const restored = detoJSON(json, {
+    const restored = fromJSON(json, {
       NotFoundError: scenarios.errors.notFound,
     });
 

@@ -10,8 +10,8 @@ export { ensure } from "./ensure";
 export { fault } from "./fault";
 export { match } from "./match";
 export {
-  detoJSON,
   type FaultErrorJSON,
+  fromJSON,
   toJSON,
 } from "./serialize";
 export { tryAsync, trySync } from "./try";

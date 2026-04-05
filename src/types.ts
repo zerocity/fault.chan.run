@@ -10,21 +10,14 @@ export interface NamedFaultError<N extends string> extends FaultError {
   readonly name: N;
 }
 
-/** Constructor for a FaultError class (untyped name). */
-export interface FaultErrorClass {
-  new (message?: string, options?: { cause?: unknown }): FaultError;
-  readonly prototype: FaultError;
-}
-
-/**
- * Constructor for a FaultError class with a known name.
- * Does not extend FaultErrorClass to prevent InstanceType from
- * picking the wider FaultError construct signature.
- */
+/** Constructor for a FaultError class with a known name. */
 export interface NamedFaultErrorClass<N extends string> {
   new (message?: string, options?: { cause?: unknown }): NamedFaultError<N>;
   readonly prototype: NamedFaultError<N>;
 }
+
+/** Shorthand for NamedFaultErrorClass with any name. */
+export type FaultErrorClass = NamedFaultErrorClass<string>;
 
 /** Result of trySync — error type narrows when wrapping a declared function. */
 export type SyncResult<T, E = unknown> =
