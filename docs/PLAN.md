@@ -19,7 +19,7 @@ Check off tasks as they're completed.
 ## Phase 2: Type Refinement
 
 - [x] Typed error flow: `declares()` → `trySync()`/`tryAsync()` → `result.error` narrowing
-- [x] `match()` guards with `isFault` — only dispatches on fault errors, not plain Error
+- [x] `match()` dispatches on fault errors + native errors by name; plain `Error` falls through to `_`
 - [x] `match()` name-vs-code priority (name wins, tested)
 - [x] Inline fault code caching correctness (tested)
 - [x] `match()` exhaustiveness: 3-arg overload requires handler for every declared error
@@ -39,6 +39,12 @@ Check off tasks as they're completed.
 - [x] `match()` exhaustiveness — done via 3-arg overload in Phase 2
 - [x] `toJSON` / `fromJSON` — JSON round-trip for API boundaries
 - [x] Benchmarks: ensure ~1.4x, trySync ~1.4x, match ~2x vs baseline (millions of ops/sec)
+
+## Phase 5: DX Refinements
+
+- [x] `ensure` string form — `ensure(val, "msg")` throws `EnsureError`, matchable for remapping
+- [x] `ensure` class-only form — `ensure(val, Err)` with message defaulting to error name
+- [x] `match()` native error interop — dispatches on `TypeError`, `AbortError`, etc. by name
 
 ---
 

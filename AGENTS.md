@@ -12,14 +12,15 @@ This is a **TypeScript library** distributed on npm as `@chan.run/fault`. It pro
 
 | Export        | File              | Purpose                                        |
 |---------------|-------------------|------------------------------------------------|
-| `ensure()`    | `src/ensure.ts`   | Assert non-null/undefined, throw if missing    |
+| `ensure()`    | `src/ensure.ts`   | Assert non-null/undefined — class, string, or class+message |
+| `EnsureError`  | `src/ensure.ts`   | Built-in error for string-form ensure          |
 | `defineError` | `src/define-error.ts` | Define a reusable typed error class        |
 | `fault()`     | `src/fault.ts`    | Throw a typed error with cause chaining        |
 | `trySync()`   | `src/try.ts`      | Run sync code, return `{ ok, data/error }`     |
 | `tryAsync()`  | `src/try.ts`      | Run async code, return `{ ok, data/error }`    |
 | `declares()`  | `src/declares.ts` | Annotate a function's error surface            |
 | `combines()`  | `src/declares.ts` | Compose error surfaces from declared functions |
-| `match()`     | `src/match.ts`    | Handle errors by type with a handler map       |
+| `match()`     | `src/match.ts`    | Handle errors by type — fault, native, or fallback |
 | `toJSON()`    | `src/serialize.ts`| Serialize a fault error for JSON transport     |
 | `fromJSON()`  | `src/serialize.ts`| Reconstruct a fault error from JSON            |
 
@@ -90,6 +91,8 @@ Runs: format:check → lint → typecheck → test → build
 - `AGENTS.md`
 - `README.md`
 - `docs/PLAN.md`
+- `docs/api.md`
+- `docs/examples/*.md`
 
 ### arch — structural entry points
 
