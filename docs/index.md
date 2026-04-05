@@ -1,5 +1,5 @@
 ---
-title: "@chan.run/ensure"
+title: "ensure"
 description: "Type-safe errors without the boilerplate"
 ---
 
