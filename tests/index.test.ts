@@ -5,10 +5,83 @@ import {
   ensure,
   fault,
   expect as faultExpect,
+  type MatchHandlers,
   match,
   tryAsync,
   trySync,
 } from "../src/index";
+
+function given() {
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test Data Scenarios
+  // ─────────────────────────────────────────────────────────────────────────
+  const scenarios = {
+    errors: {
+      notFound: defineError("NotFoundError"),
+      validation: defineError("ValidationError", { code: "VALIDATION" }),
+      db: defineError("DbError"),
+      withCode: defineError("MyError", { code: "MY_CODE" }),
+    },
+    causes: {
+      root: new Error("root cause"),
+    },
+    values: {
+      present: "hello",
+      zero: 0,
+      emptyString: "",
+      falseBool: false,
+      missing: {
+        null: null as string | null,
+        undefined: undefined as string | undefined,
+      },
+    },
+    json: {
+      valid: '{"a":1}',
+      parsed: { a: 1 },
+    },
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Terminal Actions
+  // ─────────────────────────────────────────────────────────────────────────
+  const when = {
+    defineError: (name: string, options?: { code?: string }) =>
+      defineError(name, options),
+    throwFault: (target: Parameters<typeof fault>[0], message: string) => () =>
+      fault(target, message),
+    throwFaultWithCause:
+      (target: Parameters<typeof fault>[0], message: string, cause: Error) =>
+      () =>
+        fault(target, message, { cause }),
+    assertValue: <T>(
+      value: T,
+      errorClass: ReturnType<typeof defineError>,
+      msg: string,
+    ) => faultExpect(value, errorClass, msg),
+    trySyncFn: <T>(fn: () => T) => trySync(fn),
+    tryAsyncFn: <T>(fn: () => Promise<T>) => tryAsync(fn),
+    matchError: <T>(error: unknown, handlers: MatchHandlers<T>) =>
+      match(error, handlers),
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Assertion Accessors
+  // ─────────────────────────────────────────────────────────────────────────
+  const then = {
+    name: (err: Error) => err.name,
+    code: (err: { code: string }) => err.code,
+    message: (err: Error) => err.message,
+    isFault: (err: { isFault: boolean }) => err.isFault,
+    cause: (err: Error) => err.cause,
+    isOk: <T>(result: { ok: boolean; data?: T }) =>
+      result.ok === true ? result : undefined,
+    isErr: <T>(result: { ok: boolean; error?: T }) =>
+      result.ok === false ? result : undefined,
+    errorOf: (result: { ok: false; error: unknown }) => result.error,
+  };
+
+  return { scenarios, when, then };
+}
 
 // ============================================================================
 // defineError
@@ -16,40 +89,44 @@ import {
 
 describe("defineError", () => {
   it("creates an error class with name and code", () => {
-    const MyError = defineError("MyError");
-    const err = new MyError("test");
+    const { scenarios, then } = given();
+    const err = new scenarios.errors.notFound("test");
+
     expect(err).toBeInstanceOf(Error);
-    expect(err.name).toBe("MyError");
-    expect(err.code).toBe("MyError");
-    expect(err.isFault).toBe(true);
-    expect(err.message).toBe("test");
+    expect(then.name(err)).toBe("NotFoundError");
+    expect(then.code(err)).toBe("NotFoundError");
+    expect(then.isFault(err)).toBe(true);
+    expect(then.message(err)).toBe("test");
   });
 
   it("accepts a custom code", () => {
-    const MyError = defineError("MyError", { code: "MY_CODE" });
-    const err = new MyError("test");
-    expect(err.code).toBe("MY_CODE");
-    expect(err.name).toBe("MyError");
+    const { scenarios, then } = given();
+    const err = new scenarios.errors.withCode("test");
+
+    expect(then.code(err)).toBe("MY_CODE");
+    expect(then.name(err)).toBe("MyError");
   });
 
   it("supports error cause chaining", () => {
-    const MyError = defineError("MyError");
-    const rootCause = new Error("root");
-    const err = new MyError("wrapped", { cause: rootCause });
-    expect(err.cause).toBe(rootCause);
+    const { scenarios, then } = given();
+    const err = new scenarios.errors.notFound("wrapped", {
+      cause: scenarios.causes.root,
+    });
+
+    expect(then.cause(err)).toBe(scenarios.causes.root);
   });
 
   it("sets constructor name for stack traces", () => {
-    const MyError = defineError("MyError");
-    expect(MyError.name).toBe("MyError");
+    const { scenarios } = given();
+    expect(scenarios.errors.notFound.name).toBe("NotFoundError");
   });
 
   it("supports instanceof checks", () => {
-    const FooError = defineError("FooError");
-    const BarError = defineError("BarError");
-    const err = new FooError("test");
-    expect(err).toBeInstanceOf(FooError);
-    expect(err).not.toBeInstanceOf(BarError);
+    const { scenarios } = given();
+    const err = new scenarios.errors.notFound("test");
+
+    expect(err).toBeInstanceOf(scenarios.errors.notFound);
+    expect(err).not.toBeInstanceOf(scenarios.errors.db);
   });
 
   it("supports custom base class", () => {
@@ -58,6 +135,7 @@ describe("defineError", () => {
     }
     const MyError = defineError("MyError", { base: CustomBase });
     const err = new MyError("test");
+
     expect(err).toBeInstanceOf(CustomBase);
     expect(err).toBeInstanceOf(Error);
   });
@@ -69,19 +147,21 @@ describe("defineError", () => {
 
 describe("fault", () => {
   it("throws from a defined class", () => {
-    const MyError = defineError("MyError");
-    expect(() => fault(MyError, "boom")).toThrow("boom");
+    const { scenarios, when } = given();
+    expect(when.throwFault(scenarios.errors.notFound, "boom")).toThrow("boom");
   });
 
   it("throws from an inline string code", () => {
-    expect(() => fault("INLINE_CODE", "oops")).toThrow("oops");
+    const { when, then } = given();
+    expect(when.throwFault("INLINE_CODE", "oops")).toThrow("oops");
+
     try {
       fault("INLINE_CODE", "oops");
     } catch (e) {
-      const err = e as InstanceType<ReturnType<typeof defineError>>;
-      expect(err.name).toBe("INLINE_CODE");
-      expect(err.code).toBe("INLINE_CODE");
-      expect(err.isFault).toBe(true);
+      const err = e as Error & { code: string; isFault: boolean };
+      expect(then.name(err)).toBe("INLINE_CODE");
+      expect(then.code(err)).toBe("INLINE_CODE");
+      expect(then.isFault(err)).toBe(true);
     }
   });
 
@@ -98,12 +178,13 @@ describe("fault", () => {
   });
 
   it("supports cause option", () => {
-    const MyError = defineError("MyError");
-    const cause = new Error("root");
+    const { scenarios, then } = given();
     try {
-      fault(MyError, "wrapped", { cause });
+      fault(scenarios.errors.notFound, "wrapped", {
+        cause: scenarios.causes.root,
+      });
     } catch (e) {
-      expect((e as Error).cause).toBe(cause);
+      expect(then.cause(e as Error)).toBe(scenarios.causes.root);
     }
   });
 });
@@ -113,42 +194,68 @@ describe("fault", () => {
 // ============================================================================
 
 describe("expect", () => {
-  const NotFound = defineError("NotFound");
-
   it("returns value when non-null", () => {
-    expect(faultExpect("hello", NotFound, "fail")).toBe("hello");
+    const { scenarios, when } = given();
+    const result = when.assertValue(
+      scenarios.values.present,
+      scenarios.errors.notFound,
+      "fail",
+    );
+    expect(result).toBe("hello");
   });
 
   it("returns value when falsy but defined (0, empty string, false)", () => {
-    expect(faultExpect(0, NotFound, "fail")).toBe(0);
-    expect(faultExpect("", NotFound, "fail")).toBe("");
-    expect(faultExpect(false, NotFound, "fail")).toBe(false);
-  });
+    const { scenarios, when } = given();
+    const { notFound } = scenarios.errors;
 
-  it("throws on null", () => {
-    expect(() => faultExpect(null, NotFound, "was null")).toThrow("was null");
-  });
-
-  it("throws on undefined", () => {
-    expect(() => faultExpect(undefined, NotFound, "was undef")).toThrow(
-      "was undef",
+    expect(when.assertValue(scenarios.values.zero, notFound, "fail")).toBe(0);
+    expect(
+      when.assertValue(scenarios.values.emptyString, notFound, "fail"),
+    ).toBe("");
+    expect(when.assertValue(scenarios.values.falseBool, notFound, "fail")).toBe(
+      false,
     );
   });
 
+  it("throws on null", () => {
+    const { scenarios } = given();
+    expect(() =>
+      faultExpect(
+        scenarios.values.missing.null,
+        scenarios.errors.notFound,
+        "was null",
+      ),
+    ).toThrow("was null");
+  });
+
+  it("throws on undefined", () => {
+    const { scenarios } = given();
+    expect(() =>
+      faultExpect(
+        scenarios.values.missing.undefined,
+        scenarios.errors.notFound,
+        "was undef",
+      ),
+    ).toThrow("was undef");
+  });
+
   it("thrown error is an instance of the given class", () => {
+    const { scenarios } = given();
     try {
-      faultExpect(null, NotFound, "test");
+      faultExpect(null, scenarios.errors.notFound, "test");
     } catch (e) {
-      expect(e).toBeInstanceOf(NotFound);
+      expect(e).toBeInstanceOf(scenarios.errors.notFound);
     }
   });
 
   it("supports cause option", () => {
-    const cause = new Error("root");
+    const { scenarios, then } = given();
     try {
-      faultExpect(null, NotFound, "test", { cause });
+      faultExpect(null, scenarios.errors.notFound, "test", {
+        cause: scenarios.causes.root,
+      });
     } catch (e) {
-      expect((e as Error).cause).toBe(cause);
+      expect(then.cause(e as Error)).toBe(scenarios.causes.root);
     }
   });
 });
@@ -165,28 +272,31 @@ describe("ensure (alias for expect)", () => {
 
 describe("trySync", () => {
   it("returns ok result on success", () => {
-    const result = trySync(() => 42);
+    const { when } = given();
+    const result = when.trySyncFn(() => 42);
     expect(result).toEqual({ ok: true, data: 42 });
   });
 
   it("returns error result on throw", () => {
-    const result = trySync(() => {
+    const { when, then } = given();
+    const result = when.trySyncFn(() => {
       throw new Error("fail");
     });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect((result.error as Error).message).toBe("fail");
-    }
+
+    const err = then.isErr(result);
+    expect(err).toBeTruthy();
+    if (err) expect((err.error as Error).message).toBe("fail");
   });
 
   it("captures non-Error throws", () => {
-    const result = trySync(() => {
+    const { when, then } = given();
+    const result = when.trySyncFn(() => {
       throw "string error";
     });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error).toBe("string error");
-    }
+
+    const err = then.isErr(result);
+    expect(err).toBeTruthy();
+    if (err) expect(err.error).toBe("string error");
   });
 });
 
@@ -196,26 +306,31 @@ describe("trySync", () => {
 
 describe("tryAsync", () => {
   it("returns ok result on success", async () => {
-    const result = await tryAsync(async () => 42);
+    const { when } = given();
+    const result = await when.tryAsyncFn(async () => 42);
     expect(result).toEqual({ ok: true, data: 42 });
   });
 
   it("returns error result on rejection", async () => {
-    const result = await tryAsync(async () => {
+    const { when, then } = given();
+    const result = await when.tryAsyncFn(async () => {
       throw new Error("async fail");
     });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect((result.error as Error).message).toBe("async fail");
-    }
+
+    const err = then.isErr(result);
+    expect(err).toBeTruthy();
+    if (err) expect((err.error as Error).message).toBe("async fail");
   });
 
   it("captures rejected promises", async () => {
-    const result = await tryAsync(() => Promise.reject(new Error("rejected")));
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect((result.error as Error).message).toBe("rejected");
-    }
+    const { when, then } = given();
+    const result = await when.tryAsyncFn(() =>
+      Promise.reject(new Error("rejected")),
+    );
+
+    const err = then.isErr(result);
+    expect(err).toBeTruthy();
+    if (err) expect((err.error as Error).message).toBe("rejected");
   });
 });
 
@@ -225,50 +340,51 @@ describe("tryAsync", () => {
 
 describe("declares", () => {
   it("returns the same function reference", () => {
+    const { scenarios } = given();
     const fn = (x: number) => x * 2;
-    const SomeError = defineError("SomeError");
-    const declared = declares([SomeError], fn);
-    // Runtime identity — declares is a passthrough
+    const declared = declares([scenarios.errors.notFound], fn);
     expect(declared(5)).toBe(10);
   });
 
   it("preserves async function behavior", async () => {
-    const DbError = defineError("DbError");
-    const getUser = declares([DbError], async (id: string) => ({
+    const { scenarios } = given();
+    const getUser = declares([scenarios.errors.db], async (id: string) => ({
       id,
       name: "Alice",
     }));
+
     const user = await getUser("123");
     expect(user).toEqual({ id: "123", name: "Alice" });
   });
 
   it("error type flows through trySync", () => {
-    const ParseError = defineError("ParseError");
-    const safeParse = declares([ParseError], (raw: string) => JSON.parse(raw));
-    const result = trySync(() => safeParse('{"a":1}'));
+    const { scenarios, when } = given();
+    const safeParse = declares([scenarios.errors.validation], (raw: string) =>
+      JSON.parse(raw),
+    );
+
+    const result = when.trySyncFn(() => safeParse(scenarios.json.valid));
     expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.data).toEqual({ a: 1 });
-    }
+    if (result.ok) expect(result.data).toEqual(scenarios.json.parsed);
   });
 
   it("error type flows through tryAsync", async () => {
-    const NotFoundError = defineError("NotFoundError");
-    const getItem = declares([NotFoundError], async (id: string) => {
-      if (id === "missing") {
-        throw new NotFoundError("not found");
-      }
-      return { id };
-    });
+    const { scenarios, when } = given();
+    const getItem = declares(
+      [scenarios.errors.notFound],
+      async (id: string) => {
+        if (id === "missing") throw new scenarios.errors.notFound("not found");
+        return { id };
+      },
+    );
 
-    const okResult = await tryAsync(() => getItem("exists"));
+    const okResult = await when.tryAsyncFn(() => getItem("exists"));
     expect(okResult.ok).toBe(true);
 
-    const errResult = await tryAsync(() => getItem("missing"));
+    const errResult = await when.tryAsyncFn(() => getItem("missing"));
     expect(errResult.ok).toBe(false);
-    if (!errResult.ok) {
-      expect(errResult.error).toBeInstanceOf(NotFoundError);
-    }
+    if (!errResult.ok)
+      expect(errResult.error).toBeInstanceOf(scenarios.errors.notFound);
   });
 });
 
@@ -278,84 +394,92 @@ describe("declares", () => {
 
 describe("match", () => {
   it("matches by error name", () => {
-    const MyError = defineError("MyError");
-    const err = new MyError("test");
-    const result = match(err, {
-      MyError: (e) => `matched: ${e.message}`,
+    const { scenarios, when } = given();
+    const err = new scenarios.errors.notFound("test");
+
+    const result = when.matchError(err, {
+      NotFoundError: (e) => `matched: ${e.message}`,
       _: () => "fallback",
     });
+
     expect(result).toBe("matched: test");
   });
 
   it("matches by error code when name has no handler", () => {
-    const MyError = defineError("MyError", { code: "MY_CODE" });
-    const err = new MyError("test");
-    const result = match(err, {
+    const { scenarios, when } = given();
+    const err = new scenarios.errors.withCode("test");
+
+    const result = when.matchError(err, {
       MY_CODE: (e) => `code: ${e.message}`,
       _: () => "fallback",
     });
+
     expect(result).toBe("code: test");
   });
 
   it("name takes priority over code when both have handlers", () => {
-    const MyError = defineError("MyError", { code: "MY_CODE" });
-    const err = new MyError("test");
-    const result = match(err, {
+    const { scenarios, when } = given();
+    const err = new scenarios.errors.withCode("test");
+
+    const result = when.matchError(err, {
       MyError: () => "by name",
       MY_CODE: () => "by code",
       _: () => "fallback",
     });
+
     expect(result).toBe("by name");
   });
 
   it("falls back to _ handler", () => {
-    const result = match(new Error("plain"), {
+    const { when } = given();
+    const result = when.matchError(new Error("plain"), {
       SomeError: () => "no",
       _: (e) => `fallback: ${(e as Error).message}`,
     });
+
     expect(result).toBe("fallback: plain");
   });
 
   it("re-throws when no match and no fallback", () => {
+    const { when } = given();
     expect(() =>
-      match(new Error("unmatched"), {
-        SomeError: () => "no",
-      }),
+      when.matchError(new Error("unmatched"), { SomeError: () => "no" }),
     ).toThrow("unmatched");
   });
 
   it("does not match plain Error by name — only fault errors", () => {
-    // A plain Error has name === "Error", but match() should not
-    // dispatch to an "Error" handler since it's not a fault error.
-    const plainError = new Error("plain");
-    const result = match(plainError, {
+    const { when } = given();
+    const result = when.matchError(new Error("plain"), {
       Error: () => "should not match",
       _: () => "fallback",
     });
+
     expect(result).toBe("fallback");
   });
 
   it("handles non-Error throws via fallback", () => {
-    const result = match("string error", {
+    const { when } = given();
+    const result = when.matchError("string error", {
       SomeError: () => "no",
       _: (e) => `caught: ${e}`,
     });
+
     expect(result).toBe("caught: string error");
   });
 
   it("re-throws non-Error when no fallback", () => {
+    const { when } = given();
     expect(() =>
-      match("string error", {
-        SomeError: () => "no",
-      }),
+      when.matchError("string error", { SomeError: () => "no" }),
     ).toThrow("string error");
   });
 
   it("works with inline fault codes", () => {
+    const { when } = given();
     try {
       fault("RATE_LIMITED", "slow down");
     } catch (e) {
-      const result = match(e, {
+      const result = when.matchError(e, {
         RATE_LIMITED: (err) => `matched: ${err.message}`,
         _: () => "fallback",
       });
