@@ -482,6 +482,34 @@ describe("match", () => {
       expect(result).toBe("matched: slow down");
     }
   });
+
+  it("matches native errors by name (TypeError, SyntaxError, etc.)", () => {
+    const { when } = given();
+    const result = when.matchError(new TypeError("bad"), {
+      TypeError: (e) => `type: ${e.message}`,
+      _: () => "fallback",
+    });
+    expect(result).toBe("type: bad");
+  });
+
+  it("matches DOMException by name (AbortError)", () => {
+    const { when } = given();
+    const abort = new DOMException("aborted", "AbortError");
+    const result = when.matchError(abort, {
+      AbortError: (e) => `abort: ${e.message}`,
+      _: () => "fallback",
+    });
+    expect(result).toBe("abort: aborted");
+  });
+
+  it("still falls through plain Error to _ (name is 'Error')", () => {
+    const { when } = given();
+    const result = when.matchError(new Error("plain"), {
+      Error: () => "should not match",
+      _: () => "fallback",
+    });
+    expect(result).toBe("fallback");
+  });
 });
 
 // ============================================================================

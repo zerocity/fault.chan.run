@@ -202,6 +202,25 @@ describe("example: wrapping — fetchJson (tryAsync + match)", () => {
       expect((result.error as Error).cause).toBeInstanceOf(TypeError);
     }
   });
+
+  it("throws TimeoutError on abort", async () => {
+    const mockFetch = async () => {
+      throw new DOMException("The operation was aborted", "AbortError");
+    };
+
+    const result = await tryAsync(
+      fetchJson,
+      "https://api.example.com",
+      mockFetch,
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBeInstanceOf(TimeoutError);
+      expect(result.error.message).toBe(
+        "Request to https://api.example.com timed out",
+      );
+    }
+  });
 });
 
 // ============================================================================
@@ -277,6 +296,25 @@ describe("example: wrapping — fetchJson (try/catch + match)", () => {
     if (!result.ok) {
       expect(result.error).toBeInstanceOf(ApiError);
       expect((result.error as Error).cause).toBeInstanceOf(TypeError);
+    }
+  });
+
+  it("throws TimeoutError on abort", async () => {
+    const mockFetch = async () => {
+      throw new DOMException("The operation was aborted", "AbortError");
+    };
+
+    const result = await tryAsync(
+      fetchJson,
+      "https://api.example.com",
+      mockFetch,
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBeInstanceOf(TimeoutError);
+      expect(result.error.message).toBe(
+        "Request to https://api.example.com timed out",
+      );
     }
   });
 });

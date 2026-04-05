@@ -7,8 +7,9 @@ import type {
 
 /**
  * Handle an error by matching against a handler map keyed by name or code.
- * Only fault-created errors (with isFault === true) are matched by name/code.
- * Non-fault errors fall through to the _ handler or are re-thrown.
+ * Fault errors are matched by name, then by code.
+ * Native errors (TypeError, AbortError, SyntaxError, etc.) are matched by name.
+ * Plain `Error` (name === "Error") always falls through to `_` to avoid catching everything.
  *
  * When the error type is known (from declares + tryAsync), handlers are
  * exhaustiveness-checked — TypeScript will error if you miss one:
@@ -52,16 +53,25 @@ export function match<T>(
     ? (typedHandlers as unknown as MatchHandlers<T>)
     : (handlersOrClasses as MatchHandlers<T>);
 
-  if (error instanceof Error && isFaultError(error)) {
-    // Match by name first, then by code
-    const nameHandler = handlers[error.name];
-    if (nameHandler) {
-      return nameHandler(error);
-    }
+  if (error instanceof Error) {
+    if (isFaultError(error)) {
+      // Fault errors: match by name first, then by code
+      const nameHandler = handlers[error.name];
+      if (nameHandler) {
+        return nameHandler(error);
+      }
 
-    const codeHandler = handlers[error.code];
-    if (codeHandler) {
-      return codeHandler(error);
+      const codeHandler = handlers[error.code];
+      if (codeHandler) {
+        return codeHandler(error);
+      }
+    } else if (error.name !== "Error") {
+      // Native errors (TypeError, AbortError, etc.): match by name.
+      // Skip plain "Error" to avoid catching everything.
+      const nameHandler = handlers[error.name];
+      if (nameHandler) {
+        return nameHandler(error as FaultError);
+      }
     }
   }
 

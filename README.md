@@ -152,7 +152,7 @@ const userResult = await tryAsync(() => fetchUser(id));
 
 ### `match(error, handlers)`
 
-Match an error by name or code. The `_` key is the fallback. Only fault-created errors are matched — plain `Error` objects fall through to `_`.
+Match an error by name or code. The `_` key is the fallback. Works with fault errors (by name + code), native errors like `TypeError` and `AbortError` (by name), and plain `Error` (always falls through to `_`).
 
 ```ts
 import { match } from "@chan.run/fault";
