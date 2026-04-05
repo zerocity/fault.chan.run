@@ -1,5 +1,5 @@
 ---
-title: "Example: Wrapping Third-Party Code"
+title: "Wrapping Third-Party Code"
 description: Turn untyped third-party errors into typed faults
 ---
 

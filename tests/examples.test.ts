@@ -53,7 +53,7 @@ describe("example: route handler", () => {
 // docs/examples/error-catalog.md
 // ============================================================================
 
-describe("example: error catalog", () => {
+describe("error catalog", () => {
   // errors.ts
   const UnauthorizedError = defineError("UnauthorizedError");
   const UserNotFoundError = defineError("UserNotFoundError");

@@ -1,5 +1,5 @@
 ---
-title: "Example: Error Catalog"
+title: "Error Catalog"
 description: Organize errors by domain in a shared module
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Example: Route Handler"
+title: "Route Handler"
 description: A complete route handler with typed error handling
 ---
 
