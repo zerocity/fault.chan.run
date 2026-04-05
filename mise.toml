@@ -1,0 +1,37 @@
+[tools]
+node = "22"
+pnpm = "latest"
+"npm:@biomejs/biome" = "latest"
+"npm:@mariozechner/pi-coding-agent" = "latest"
+
+[tasks.build]
+description = "Build the project"
+run = "pnpm run build"
+
+[tasks.test]
+description = "Run all tests"
+run = "pnpm run test"
+
+[tasks."test:watch"]
+description = "Run tests in watch mode"
+run = "pnpm run test:watch"
+
+[tasks.lint]
+description = "Lint with biome"
+run = "pnpm run lint"
+
+[tasks.typecheck]
+description = "Type-check with tsc"
+run = "pnpm run typecheck"
+
+[tasks.format]
+description = "Format with biome"
+run = "pnpm run format"
+
+[tasks."format:check"]
+description = "Check formatting (CI)"
+run = "pnpm run format:check"
+
+[tasks.check]
+description = "Run all verification checks"
+depends = ["format:check", "lint", "typecheck", "test", "build"]
