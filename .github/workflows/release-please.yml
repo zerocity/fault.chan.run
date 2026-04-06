@@ -60,8 +60,10 @@ jobs:
     if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger www.chan.run deploy
-        run: gh workflow run deploy.yml -R zerocity/www.chan.run --ref main
+      - name: Trigger www.chan.run deploy from latest release tag
+        run: |
+          TAG=$(gh release view -R zerocity/www.chan.run --json tagName -q .tagName)
+          gh workflow run deploy.yml -R zerocity/www.chan.run --ref main -f tag_name="$TAG"
         env:
           GH_TOKEN: ${{ secrets.PRODUCT_DOCS_TOKEN }}
 
