@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/zerocity/ensure.chan.run/compare/v0.2.0...v0.3.0) (2026-04-06)
+
+
+### Features
+
+* **docs:** add typedoc API reference generation ([5454a2b](https://github.com/zerocity/ensure.chan.run/commit/5454a2bc1f77b0499a10d4821a05e8703c6a9a22))
+* update context7 docs on release ([47ca8d9](https://github.com/zerocity/ensure.chan.run/commit/47ca8d97d3dead4220597e51a37f7aa5f4211c59))
+
 ## [0.2.0](https://github.com/zerocity/ensure.chan.run/compare/v0.1.0...v0.2.0) (2026-04-05)
 
 
