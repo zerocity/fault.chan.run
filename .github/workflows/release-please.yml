@@ -64,3 +64,14 @@ jobs:
         run: gh workflow run deploy.yml -R zerocity/www.chan.run --ref main
         env:
           GH_TOKEN: ${{ secrets.PRODUCT_DOCS_TOKEN }}
+
+  update-context7:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Update Context7 documentation
+        uses: rennf93/upsert-context7@v1
+        with:
+          operation: refresh
