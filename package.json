@@ -1,6 +1,6 @@
 {
   "name": "@chan.run/ensure",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "https://www.chan.run/libraries/ensure",
   "description": "Type-safe errors without the boilerplate",
   "license": "MIT",

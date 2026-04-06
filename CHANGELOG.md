@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/zerocity/ensure.chan.run/compare/v0.3.0...v0.3.1) (2026-04-06)
+
+
+### Bug Fixes
+
+* **ci:** use correct tag for upsert-context7 action ([7b8ddcf](https://github.com/zerocity/ensure.chan.run/commit/7b8ddcf3331ee6be62666fa334c6beb2be232aed))
+* update action ([7e55c7e](https://github.com/zerocity/ensure.chan.run/commit/7e55c7ebeb81ea05a43342a2796afc3bf00a8bf9))
+
 ## [0.3.0](https://github.com/zerocity/ensure.chan.run/compare/v0.2.0...v0.3.0) (2026-04-06)
 
 
